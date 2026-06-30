@@ -1,8 +1,10 @@
-const CACHE = 'panzhongbao-v1.0.0';
+const CACHE = 'panzhongbao-v1.1.0';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
+  './css/style.css',
+  './js/app.js',
   './icon-192.png',
   './icon-512.png'
 ];

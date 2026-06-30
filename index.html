@@ -4,16 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="description" content="个人基金盘中估值监控">
-<!-- [修改7] 黑曜石深色主题色 -->
-<meta name="theme-color" content="#0f0f1a">
+<!-- [青绿插金] 浅色主题色 -->
+<meta name="theme-color" content="#F5F7F5">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- [青绿插金] iOS状态栏改为浅色默认 -->
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <!-- [修改6] iOS 桌面名称改为盘中宝 -->
 <meta name="apple-mobile-web-app-title" content="盘中宝">
 <link rel="manifest" href="manifest.json">
+<!-- [青绿插金] 引入 JetBrains Mono 和 思源宋体 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <!-- [修改6] 浏览器标签页标题改为盘中宝 -->
 <title>盘中宝</title>
@@ -47,7 +49,6 @@
 <!-- ========== 指数行情栏 ========== -->
 <div class="index-bar" id="index-bar">
   <div class="index-bar-inner" id="index-bar-inner">
-    <!-- [修改9] 指数名称缩写，数值JS取整 -->
     <div class="index-item"><div class="index-name">纳指</div><div class="index-price">--</div><div class="index-change">--</div></div>
     <div class="index-item"><div class="index-name">标普</div><div class="index-price">--</div><div class="index-change">--</div></div>
     <div class="index-item"><div class="index-name">黄金</div><div class="index-price">--</div><div class="index-change">--</div></div>
@@ -57,8 +58,6 @@
 </div>
 
 <div class="last-upd" id="last-upd"></div>
-
-<!-- [修改2] 删除了持仓市值 summary 区域 -->
 
 <!-- ========== 页面一：行情页 ========== -->
 <div class="page active" id="page-market">
@@ -118,7 +117,7 @@
       </div>
     </div>
 
-    <div class="sec-title">云同步 (GitHub Gist) <span style="font-weight:400;font-size:11px;color:var(--muted)">自动双向同步</span></div>
+    <div class="sec-title">云同步 (GitHub Gist) <span style="font-weight:400;font-size:11px;color:var(--c-muted)">自动双向同步</span></div>
     <div class="cloud-section">
       <div class="f-row">
         <div class="f-label">GitHub Personal Access Token</div>
@@ -154,13 +153,11 @@
   <button class="nav-btn" id="nav-edit" onclick="switchPage('edit')">
     <span class="nav-icon">⚙️</span>持仓
   </button>
-  <!-- [修改3] 删除了状态页导航按钮 -->
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script src="js/app.js" defer></script>
 
-<!-- 通知权限请求（由 app.js 自动处理） -->
 </body>
 </html>

@@ -1,7 +1,6 @@
 // ═══════════════════════════════════════════════════════
 //  盘中宝 (panzhongbao) - 基金盘中估值监控
-//  基于 FundVal 修改
-//  修改内容: 黑金主题、下拉刷新、通知推送、删除状态页/汇总栏/刷新按钮等
+//  适配青绿插金主题
 // ═══════════════════════════════════════════════════════
 
 // ── 存储 Key（panzhongbao_ 前缀） ────────────────────
@@ -32,7 +31,7 @@ const TIMING = {
 
 const SKIP_CACHE_KEYS = ['_cached', 'message'];
 
-// ── 指数配置（名称缩写，符合需求9） ──────────────────
+// ── 指数配置（名称缩写） ──────────────────
 const INDEX_CONFIG = [
   { code: 'usIXIC',   name: '纳指' },
   { code: 'usINX',    name: '标普' },
@@ -65,12 +64,12 @@ let autoPullTimer = null;
 let isSyncing = false;
 let goldCache = { price: NaN, changePct: NaN, time: 0 };
 
-// ── 通知推送相关（新增） ─────────────────────────────
+// ── 通知推送相关 ─────────────────────────────
 let notificationTimer = null;
 let lastNotificationDate = '';       // 记录上次推送日期，避免重复推送
 let notificationPermission = false;
 
-// ── 下拉刷新相关（新增） ──────────────────────────────
+// ── 下拉刷新相关 ──────────────────────────────
 let pullStartY = 0;
 let pullMoveY = 0;
 let isPulling = false;
@@ -138,7 +137,7 @@ function getChinaDate() {
   return new Date(now.getTime() + (now.getTimezoneOffset() + 480) * 60000);
 }
 
-// ── 导出 / 导入（文件名已改为 panzhongbao） ──────────
+// ── 导出 / 导入 ──────────────────────────────────────────
 function exportData() {
   const blob = new Blob([JSON.stringify(holdings, null, 2)], {type:'application/json'});
   const a = document.createElement('a');
@@ -205,10 +204,12 @@ function renderCloudStatus() {
   if (syncTime) {
     var d = new Date(syncTime);
     el.textContent = '上次同步: ' + d.toLocaleString('zh-CN');
-    el.style.color = 'var(--up)';
+    // 【适配新主题】将 var(--up) 替换为 var(--c-red)
+    el.style.color = 'var(--c-red)';
   } else {
     el.textContent = '配置 Token 后自动同步';
-    el.style.color = 'var(--muted)';
+    // 【适配新主题】将 var(--muted) 替换为 var(--c-muted)
+    el.style.color = 'var(--c-muted)';
   }
 }
 
@@ -658,7 +659,7 @@ async function fetchFundFull(code) {
   return primary;
 }
 
-// ── 刷新所有持仓数据（改为下拉刷新触发，删除按钮相关） ──
+// ── 刷新所有持仓数据 ─────────────────────────────────────
 async function refresh(showPullLoading) {
   if (isRefreshing) {
     refreshQueued = true;
@@ -1023,7 +1024,7 @@ function parseFundFeeData(data) {
   return Object.keys(result).length ? result : null;
 }
 
-// ── 渲染基金列表（已删除持仓市值汇总栏） ───────────────
+// ── 渲染基金列表 ─────────────────────────────────────────
 function renderFundList(data) {
   var list = document.getElementById('fund-list');
   if (!data || data.length === 0) {
@@ -1170,7 +1171,8 @@ function esc(s) {
 function renderHoldingsList() {
   const list = document.getElementById('holdings-list');
   if (!holdings.filter(h => !h.deleted).length) {
-    list.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:4px 0">暂无持仓</div>';
+    // 【适配新主题】将 var(--muted) 替换为 var(--c-muted)
+    list.innerHTML = '<div style="color:var(--c-muted);font-size:13px;padding:4px 0">暂无持仓</div>';
     return;
   }
   list.innerHTML = holdings.filter(h => !h.deleted).map(h => `
@@ -1255,7 +1257,7 @@ function delFund(code) {
   refresh();
 }
 
-// ── 页面切换（已删除状态页） ─────────────────────────────
+// ── 页面切换 ─────────────────────────────────────────────
 let lastEditPull = 0;
 function switchPage(name) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -1271,7 +1273,6 @@ function switchPage(name) {
     }
   }
   else if (editingCode) cancelEdit();
-  // 状态页已删除，不再有 if (name==='status')
 }
 
 // ── 指数行情条（名称缩写，数值取整） ──────────────────
@@ -1291,7 +1292,7 @@ function parseTencentQuote(raw) {
   return { price: price, changePct: Number.isFinite(changePct) ? changePct : NaN };
 }
 
-// ── 黄金 AU9999 实时金价（与原来相同） ──────────────────
+// ── 黄金 AU9999 实时金价 ──────────────────────────────
 function parseSinaGoldQuote(raw) {
   if (!raw || typeof raw !== 'string') return null;
   var fields = raw.split(',');
@@ -1553,7 +1554,7 @@ function fetchIndices() {
   }
 }
 
-// ── 渲染指数条（数值取整：价格整数，涨跌幅保留一位小数） ──
+// ── 渲染指数条 ──────────────────────────────────────────
 function renderIndexBar(data) {
   var el = document.getElementById('index-bar-inner');
   if (!el || !data.length) return;
@@ -1562,7 +1563,6 @@ function renderIndexBar(data) {
     var hasData = Number.isFinite(idx.price);
     var cc = hasData ? (idx.changePct > 0 ? 'up' : idx.changePct < 0 ? 'down' : 'flat') : '';
     var sign = hasData && idx.changePct >= 0 ? '+' : '';
-    // 价格取整（个位），涨跌幅保留1位小数
     var priceStr = hasData ? Math.round(idx.price).toString() : '--';
     var changeStr = hasData ? sign + (idx.changePct >= 0 ? '+' : '') + idx.changePct.toFixed(1) + '%' : '--';
     html += '<div class="index-item">';
@@ -1629,7 +1629,7 @@ function showToast(msg, ms=2200) {
   setTimeout(function(){ t.classList.remove('show'); }, ms);
 }
 
-// ── Service Worker（保留更新检测） ──────────────────────
+// ── Service Worker ──────────────────────────────────────
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').then(function(reg) {
     reg.addEventListener('updatefound', function() {
@@ -1655,7 +1655,7 @@ document.addEventListener('visibilitychange', function() {
 });
 
 // ═══════════════════════════════════════════════════════════
-//  🆕 新增功能1：后台推送通知（交易日14:30推送涨跌幅）
+//  新增功能1：后台推送通知
 // ═══════════════════════════════════════════════════════════
 function requestNotificationPermission() {
   if (!('Notification' in window)) return;
@@ -1671,31 +1671,25 @@ function requestNotificationPermission() {
 function isTradingDay(date) {
   const d = date.getDay();
   if (d === 0 || d === 6) return false;
-  // 可额外添加中国法定节假日判断（此处简化，仅排除周末）
   return true;
 }
 
 function checkAndPushNotification() {
   const now = getChinaDate();
   const dateStr = now.toISOString().slice(0,10);
-  // 如果今天已经推送过，不再重复推送
   if (lastNotificationDate === dateStr) return;
 
-  // 交易日 && 时间在14:30～14:35之间（避免时差偏差）
   if (!isTradingDay(now)) return;
   const hours = now.getHours();
   const mins = now.getMinutes();
   if (!(hours === 14 && mins >= 30 && mins <= 35)) return;
 
-  // 确保有持仓且数据已刷新
   if (!fundsData || fundsData.length === 0) {
     refresh();
-    // 延迟几秒后再次尝试推送
     setTimeout(checkAndPushNotification, 5000);
     return;
   }
 
-  // 构建推送内容：汇总今日估算涨跌
   let totalTodayProfit = 0;
   let totalCurrValue = 0;
   let totalCost = 0;
@@ -1718,26 +1712,21 @@ function checkAndPushNotification() {
   const sign = totalTodayProfit >= 0 ? '+' : '';
   const color = totalTodayProfit >= 0 ? '📈' : '📉';
 
-  // 获取前五名涨跌最多的基金
   const sorted = sortFunds(fundsData).filter(f => Number.isFinite(f.est_change));
   const top5 = sorted.slice(0, 5).map(f => `${f.name} ${f.est_change>=0?'+':''}${f.est_change.toFixed(2)}%`).join('\n');
   const body = `今日估算盈亏：${sign}${totalTodayProfit.toFixed(2)} 元 (${profitRate.toFixed(2)}%)\n持仓市值：${totalCurrValue.toFixed(2)} 元\n\n涨幅前5：\n${top5 || '无数据'}`;
 
-  // 发送 Web Notification
   if (notificationPermission) {
     try {
       const notif = new Notification('盘中宝 - 收盘前估值', {
         body: body,
-        icon: '/icon-192.png'   // 需确保有此图标
+        icon: '/icon-192.png'
       });
       notif.onclick = function() { window.focus(); this.close(); };
-      // 记录推送日期
       lastNotificationDate = dateStr;
     } catch(e) {}
   } else {
-    // 若用户未授权，使用页面内提示
     showToast('🔔 今日估算已更新，点击查看详情', 5000);
-    // 用更醒目的方式（比如在页面顶部显示）
     const banner = document.getElementById('notification-banner');
     if (banner) {
       banner.textContent = `📊 今日预估盈亏 ${sign}${totalTodayProfit.toFixed(2)} 元 (${profitRate.toFixed(2)}%)`;
@@ -1747,18 +1736,14 @@ function checkAndPushNotification() {
   }
 }
 
-// 启动定时检查推送（每分钟一次）
 function startNotificationChecker() {
-  // 先请求权限
   requestNotificationPermission();
-  // 每60秒检查一次
   setInterval(checkAndPushNotification, TIMING.NOTIFICATION_CHECK_MS);
-  // 首次启动也检查一次（避免正好在14:30时未触发）
   setTimeout(checkAndPushNotification, 1000);
 }
 
 // ═══════════════════════════════════════════════════════════
-//  🆕 新增功能2：下拉刷新（触摸事件）
+//  新增功能2：下拉刷新
 // ═══════════════════════════════════════════════════════════
 function initPullToRefresh() {
   const container = document.querySelector('.main-content') || document.body;
@@ -1767,7 +1752,6 @@ function initPullToRefresh() {
   let isPulling = false;
 
   container.addEventListener('touchstart', function(e) {
-    // 只在滚动到顶部时启用下拉
     if (container.scrollTop <= 0) {
       startY = e.touches[0].clientY;
       isPulling = true;
@@ -1778,7 +1762,6 @@ function initPullToRefresh() {
     if (!isPulling) return;
     moveY = e.touches[0].clientY - startY;
     if (moveY > 0) {
-      // 阻止页面滚动，只显示下拉指示器
       e.preventDefault();
       const pullEl = document.querySelector('.pull-refresh');
       if (pullEl) {
@@ -1800,7 +1783,6 @@ function initPullToRefresh() {
     const pullEl = document.querySelector('.pull-refresh');
     if (pullEl) {
       if (pullEl.classList.contains('ready')) {
-        // 触发刷新
         pullEl.classList.remove('ready');
         pullEl.classList.add('loading');
         pullEl.textContent = '刷新中...';
@@ -1830,6 +1812,6 @@ startNotificationChecker();
 // 初始化下拉刷新
 initPullToRefresh();
 
-// 显示左上角版本号（可在HTML中直接显示，此处作为保险）
+// 显示左上角版本号
 var verEl = document.getElementById('app-version');
 if (verEl) verEl.textContent = APP_VERSION;

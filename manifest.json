@@ -4,8 +4,8 @@
   "description": "个人基金盘中估值监控",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#0f0f1a",
-  "theme_color": "#0f0f1a",
+  "background_color": "#F5F7F5",
+  "theme_color": "#F5F7F5",
   "orientation": "portrait",
   "icons": [
     {
