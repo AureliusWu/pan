@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="个人基金盘中估值监控">
+<!-- [修改7] 黑曜石深色主题色 -->
+<meta name="theme-color" content="#0f0f1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- [修改6] iOS 桌面名称改为盘中宝 -->
+<meta name="apple-mobile-web-app-title" content="盘中宝">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="css/style.css">
+<!-- [修改6] 浏览器标签页标题改为盘中宝 -->
+<title>盘中宝</title>
+</head>
+<body>
+
+<!-- ========== 顶部 Header ========== -->
+<div class="header">
+  <div class="header-inner">
+    <!-- [修改8] 左上角：盘中宝 + 版本号 -->
+    <div class="header-left">
+      <div class="logo">盘中宝</div>
+      <div class="version" id="app-version">v1.0.0</div>
+    </div>
+    <div class="mkt-status" id="mkt-status"></div>
+    <!-- [修改4][修改5] 删除了返回链接和刷新按钮 -->
+  </div>
+</div>
+
+<!-- [修改5] 下拉刷新提示区域 -->
+<div class="pull-refresh" id="pull-refresh">
+  <div class="pull-refresh-content">
+    <span class="pull-refresh-icon">↓</span>
+    <span class="pull-refresh-text">下拉刷新</span>
+  </div>
+</div>
+
+<!-- ========== 通知横幅（推送备用） ========== -->
+<div class="notification-banner" id="notification-banner"></div>
+
+<!-- ========== 指数行情栏 ========== -->
+<div class="index-bar" id="index-bar">
+  <div class="index-bar-inner" id="index-bar-inner">
+    <!-- [修改9] 指数名称缩写，数值JS取整 -->
+    <div class="index-item"><div class="index-name">纳指</div><div class="index-price">--</div><div class="index-change">--</div></div>
+    <div class="index-item"><div class="index-name">标普</div><div class="index-price">--</div><div class="index-change">--</div></div>
+    <div class="index-item"><div class="index-name">黄金</div><div class="index-price">--</div><div class="index-change">--</div></div>
+    <div class="index-item"><div class="index-name">上证</div><div class="index-price">--</div><div class="index-change">--</div></div>
+    <div class="index-item"><div class="index-name">沪深</div><div class="index-price">--</div><div class="index-change">--</div></div>
+  </div>
+</div>
+
+<div class="last-upd" id="last-upd"></div>
+
+<!-- [修改2] 删除了持仓市值 summary 区域 -->
+
+<!-- ========== 页面一：行情页 ========== -->
+<div class="page active" id="page-market">
+  <div class="sort-bar" id="sort-bar">
+    <button class="sort-chip active" id="sort-est-btn" onclick="toggleEstSort()">估值涨跌 ↓</button>
+  </div>
+  <div class="fund-list-head" aria-hidden="true">
+    <span>名称 / 代码</span>
+    <span>估值涨跌</span>
+    <span>盘中 / 上一净值</span>
+  </div>
+  <div class="fund-list" id="fund-list">
+    <div class="fund-card" style="pointer-events:none">
+      <div class="skeleton" style="width:55%;height:15px"></div>
+      <div class="skeleton" style="width:25%;height:11px"></div>
+    </div>
+    <div class="fund-card" style="pointer-events:none">
+      <div class="skeleton" style="width:62%;height:15px"></div>
+      <div class="skeleton" style="width:30%;height:11px"></div>
+    </div>
+    <div class="fund-card" style="pointer-events:none">
+      <div class="skeleton" style="width:48%;height:15px"></div>
+      <div class="skeleton" style="width:28%;height:11px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 页面二：持仓管理页 ========== -->
+<div class="page" id="page-edit">
+  <div class="edit-page">
+    <div class="sec-title">当前持仓</div>
+    <div id="holdings-list"></div>
+
+    <div class="sec-title">添加基金</div>
+    <div class="add-form">
+      <div class="f-row">
+        <div class="f-label">基金代码（6位）</div>
+        <input class="f-input" id="i-code" placeholder="例：110020" maxlength="6" inputmode="numeric">
+      </div>
+      <div class="f-row">
+        <div class="f-label">基金名称（可留空，自动获取）</div>
+        <input class="f-input" id="i-name" placeholder="留空则自动获取">
+      </div>
+      <div class="f-grid">
+        <div class="f-row">
+          <div class="f-label">持有份额</div>
+          <input class="f-input" id="i-shares" placeholder="0" inputmode="decimal">
+        </div>
+        <div class="f-row">
+          <div class="f-label">成本净值</div>
+          <input class="f-input" id="i-cost" placeholder="0.000" inputmode="decimal">
+        </div>
+      </div>
+      <div class="edit-btns">
+        <button class="add-btn" id="add-btn" onclick="saveFund()">+ 添加</button>
+        <button class="cancel-edit-btn" id="cancel-edit-btn" onclick="cancelEdit()" style="display:none">取消编辑</button>
+      </div>
+    </div>
+
+    <div class="sec-title">云同步 (GitHub Gist) <span style="font-weight:400;font-size:11px;color:var(--muted)">自动双向同步</span></div>
+    <div class="cloud-section">
+      <div class="f-row">
+        <div class="f-label">GitHub Personal Access Token</div>
+        <input class="f-input" id="gist-token" type="password" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off">
+        <div class="f-hint">
+          需要 <code>gist</code> 权限，<a href="https://github.com/settings/tokens" target="_blank">创建 Classic Token</a>
+           · 填入 Token 后首次点击「上传」即开始自动同步
+        </div>
+      </div>
+      <div class="cloud-status" id="cloud-status">配置 Token 后自动同步</div>
+      <div class="cloud-btns">
+        <button class="exp-btn cloud-btn" id="cloud-upload-btn" onclick="uploadToCloud()">上传到云端</button>
+        <button class="exp-btn cloud-btn" id="cloud-download-btn" onclick="downloadFromCloud()">从云端下载</button>
+      </div>
+      <button class="exp-btn cloud-clear" onclick="clearCloudConfig()">清除云同步配置</button>
+    </div>
+
+    <div class="export-row">
+      <button class="exp-btn" onclick="exportData()">↓ 导出持仓</button>
+      <button class="exp-btn" onclick="document.getElementById('imp-file').click()">↑ 导入持仓</button>
+      <input type="file" id="imp-file" accept=".json" style="display:none" onchange="importData(event)">
+    </div>
+  </div>
+</div>
+
+<!-- [修改3] 删除了状态页 page-status -->
+
+<!-- ========== 底部导航 ========== -->
+<div class="bottom-nav">
+  <button class="nav-btn active" id="nav-market" onclick="switchPage('market')">
+    <span class="nav-icon">📈</span>行情
+  </button>
+  <button class="nav-btn" id="nav-edit" onclick="switchPage('edit')">
+    <span class="nav-icon">⚙️</span>持仓
+  </button>
+  <!-- [修改3] 删除了状态页导航按钮 -->
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/app.js" defer></script>
+
+<!-- 通知权限请求（由 app.js 自动处理） -->
+</body>
+</html>
