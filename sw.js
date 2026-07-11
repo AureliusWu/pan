@@ -1,4 +1,4 @@
-const CACHE = 'panzhongbao-v1.1.0';
+const CACHE = 'panzhongbao-v1.1.1';
 const ASSETS = [
   './',
   './index.html',
